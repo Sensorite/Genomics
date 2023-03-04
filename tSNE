@@ -1,0 +1,30 @@
+import pandas as pd
+from sklearn.manifold import TSNE
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
+# Load the data from a CSV file
+df = pd.read_csv('medulloblastoma_data.csv')
+
+# Select only the relevant columns
+data = df[['MB_subgroup', 'TP53_status', 'MYC_status', 'Age_years']]
+
+# Convert categorical variables to dummy variables
+data = pd.get_dummies(data)
+
+# Apply t-SNE to reduce the dimensionality of the data to 3 dimensions
+tsne = TSNE(n_components=3, perplexity=10, random_state=0)
+tsne_data = tsne.fit_transform(data)
+
+# Create a 3D scatter plot of the t-SNE data
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(tsne_data[:, 0], tsne_data[:, 1], tsne_data[:, 2], c=df['MB_subgroup'], cmap='viridis')
+ax.set_xlabel('t-SNE Dimension 1')
+ax.set_ylabel('t-SNE Dimension 2')
+ax.set_zlabel('t-SNE Dimension 3')
+plt.show()
+
+# Save the t-SNE data to a CSV file
+tsne_df = pd.DataFrame(tsne_data, columns=['t-SNE Dim 1', 't-SNE Dim 2', 't-SNE Dim 3'])
+tsne_df.to_csv('medulloblastoma_tsne.csv', index=False)
